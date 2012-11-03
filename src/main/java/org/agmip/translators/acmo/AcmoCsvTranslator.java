@@ -91,8 +91,8 @@ public class AcmoCsvTranslator {
             sbData.append(",\"").append(formatDateStr(getObjectOr(sumSubData, "mdat", ""))).append("\""); // MDAT
             sbData.append(",\"").append(formatDateStr(getObjectOr(sumSubData, "hdat", ""))).append("\""); // HDATE
             sbData.append(",\"").append(getObjectOr(sumSubData, "laix", "")).append("\""); // LAIX
-            sbData.append(",\"").append(getObjectOr(sumSubData, "prcm", "")).append("\""); // PRCM (PRCP)
-            sbData.append(",\"").append(getObjectOr(sumSubData, "etcm", "")).append("\""); // ETCM (ETCP)
+            sbData.append(",\"").append(getObjectOr(sumSubData, "prcp", "")).append("\""); // PRCP
+            sbData.append(",\"").append(getObjectOr(sumSubData, "etcp", "")).append("\""); // ETCP
             sbData.append(",\"").append(getObjectOr(sumSubData, "nucm", "")).append("\""); // NUCM
             sbData.append(",\"").append(getObjectOr(sumSubData, "nlcm", "")).append("\""); // NLCM
             if (!sumValMap.containsKey(exp_id)) {

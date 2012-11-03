@@ -177,6 +177,14 @@ public class AcmoDssatOutputFileInput extends AcmoCommonInput {
                     formats.put("dpnum", 9);
                     formats.put("ypnam", 9);
                     formats.put("ypnum", 9);
+                    formats.put("ndch", 6);
+                    formats.put("tmaxa", 6);
+                    formats.put("tmina", 6);
+                    formats.put("srada", 6);
+                    formats.put("dayla", 6);
+                    formats.put("co2a", 7);
+                    formats.put("prcp", 7);
+                    formats.put("etcp", 7);
                     // Read line and save into return holder
                     sumArr.add(readLine(line, formats));
                 }
