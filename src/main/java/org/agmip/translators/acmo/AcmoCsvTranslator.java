@@ -68,7 +68,7 @@ public class AcmoCsvTranslator {
 
         // Get simulation output values from output files by experiment id
         HashMap<String, String> sumValMap = new HashMap();
-        ArrayList<String> sumValArr = new ArrayList();
+//        ArrayList<String> sumValArr = new ArrayList();
         String version = getObjectOr(sumData, "vevsion", "Ver. N/A");
         StringBuilder sbData;
         for (int i = 0; i < sumSubArr.size(); i++) {
@@ -76,29 +76,34 @@ public class AcmoCsvTranslator {
             sumSubData = sumSubArr.get(i);
             ovwSubData = ovwSubArr.get(i);
             String runno_sum = getObjectOr(sumSubData, "runno", "sum");
-            String exp_id = getObjectOr(ovwSubData, "exp_id", "");
             String runno_ovw = getObjectOr(ovwSubData, "runno", "ovm");
+            String pdat = formatDateStr(getObjectOr(sumSubData, "pdat", ""));
+            String exp_id = getObjectOr(ovwSubData, "exp_id", "");
+            String key = exp_id + "," + pdat;
+            System.out.println(key);
             if (!runno_sum.equals(runno_ovw)) {
                 log.warn("THE ORDER OF No." + (i + 1) + " RECORD [" + exp_id + "] IS NOT MATCHED BETWEEN SUMMARY AND OVERVIEW OUTPUT FILE");
                 continue;
             }
 
             // Create CSV data
-            sbData.append(",\"DSSAT ").append(getObjectOr(sumSubData, "model", "")).append(" ").append(version).append("\""); // MODEL_VER
-            sbData.append(",\"").append(getObjectOr(sumSubData, "hwah", "")).append("\""); // HWAH
-            sbData.append(",\"").append(getObjectOr(sumSubData, "cwam", "")).append("\""); // CWAH
-            sbData.append(",\"").append(formatDateStr(getObjectOr(sumSubData, "adat", ""))).append("\""); // ADAT
-            sbData.append(",\"").append(formatDateStr(getObjectOr(sumSubData, "mdat", ""))).append("\""); // MDAT
-            sbData.append(",\"").append(formatDateStr(getObjectOr(sumSubData, "hdat", ""))).append("\""); // HDATE
-            sbData.append(",\"").append(getObjectOr(sumSubData, "laix", "")).append("\""); // LAIX
-            sbData.append(",\"").append(getObjectOr(sumSubData, "prcp", "")).append("\""); // PRCP
-            sbData.append(",\"").append(getObjectOr(sumSubData, "etcp", "")).append("\""); // ETCP
-            sbData.append(",\"").append(getObjectOr(sumSubData, "nucm", "")).append("\""); // NUCM
-            sbData.append(",\"").append(getObjectOr(sumSubData, "nlcm", "")).append("\""); // NLCM
-            if (!sumValMap.containsKey(exp_id)) {
-                sumValMap.put(exp_id, sbData.toString()); // P.S. since non-DSSAT model won't have multiple treament, thus trno is not used as the part of key
+            if (!sumValMap.containsKey(key)) {
+                sbData.append(",\"DSSAT ").append(getObjectOr(sumSubData, "model", "")).append(" ").append(version).append("\""); // MODEL_VER
+                sbData.append(",\"").append(getObjectOr(sumSubData, "hwah", "")).append("\""); // HWAH
+                sbData.append(",\"").append(getObjectOr(sumSubData, "cwam", "")).append("\""); // CWAH
+                sbData.append(",\"").append(formatDateStr(getObjectOr(sumSubData, "adat", ""))).append("\""); // ADAT
+                sbData.append(",\"").append(formatDateStr(getObjectOr(sumSubData, "mdat", ""))).append("\""); // MDAT
+                sbData.append(",\"").append(formatDateStr(getObjectOr(sumSubData, "hdat", ""))).append("\""); // HDATE
+                sbData.append(",\"").append(getObjectOr(sumSubData, "laix", "")).append("\""); // LAIX
+                sbData.append(",\"").append(getObjectOr(sumSubData, "prcp", "")).append("\""); // PRCP
+                sbData.append(",\"").append(getObjectOr(sumSubData, "etcp", "")).append("\""); // ETCP
+                sbData.append(",\"").append(getObjectOr(sumSubData, "nucm", "")).append("\""); // NUCM
+                sbData.append(",\"").append(getObjectOr(sumSubData, "nlcm", "")).append("\""); // NLCM
+                sumValMap.put(key, sbData.toString()); // P.S. since non-DSSAT model won't have multiple treament, thus trno is not used as the part of key
+            } else {
+                log.warn("REPEATED RECORD IN SUMMARY FILE WITH SAME PDAT AND EXNAME");
             }
-            sumValArr.add(sbData.toString());
+//            sumValArr.add(sbData.toString());
 
         }
 
@@ -118,10 +123,12 @@ public class AcmoCsvTranslator {
 
             // currently exname (exp_id) is located in the 3rd spot of row
             String[] tmp = line.split(",");
-            if (tmp.length < 2 || tmp[2].trim().equals("")) {
+            if (tmp.length < 21 || tmp[3].trim().equals("") || tmp[20].trim().equals("")) {
+//                System.out.println(tmp.length + "," + tmp[3]);
                 bw.write(line);
-                log.warn("MISSING EXNAME IN LINE " + curDataLineNo);
+                log.warn("MISSING EXNAME OR SDAT IN LINE " + curDataLineNo);
             } else {
+                tmp[20] = tmp[20].replaceAll("/", "-");
                 // remove the comma for blank cell which will be filled with output value
                 if (line.endsWith(",")) {
                     line = trimComma(tmp, 35);
@@ -129,15 +136,18 @@ public class AcmoCsvTranslator {
                 bw.write(line);
 
                 // wirte simulation output info
-                if (sumValMap.containsKey(tmp[2])) {
-                    bw.write(sumValMap.remove(tmp[2])); // P.S. temporal way for multiple treatment
+                String scvKey = tmp[3] + "," + tmp[20];
+                System.out.println(scvKey);
+                if (sumValMap.containsKey(scvKey)) {
+                    bw.write(sumValMap.remove(scvKey)); // P.S. temporal way for multiple treatment
                 } else {
+                    log.warn("THE SIMULATION OUTPUT DATA FOR [" + scvKey + "] IS MISSING");
 
-                    if (curDataLineNo - 4 < sumValArr.size()) {
-                        bw.write(sumValArr.get(curDataLineNo - 4));
-                    } else {
-                        log.warn("THE SIMULATION OUTPUT DATA FOR [" + tmp[2] + "] IS MISSING");
-                    }
+//                    if (curDataLineNo - 4 < sumValArr.size()) {
+//                        bw.write(sumValArr.get(curDataLineNo - 4));
+//                    } else {
+//                        log.warn("THE SIMULATION OUTPUT DATA FOR [" + tmp[2] + "] IS MISSING");
+//                    }
                 }
             }
 

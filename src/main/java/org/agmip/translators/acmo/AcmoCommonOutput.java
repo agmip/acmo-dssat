@@ -1,6 +1,7 @@
 package org.agmip.translators.acmo;
 
 import java.io.File;
+import java.util.Calendar;
 import java.util.HashMap;
 import org.agmip.core.types.TranslatorOutput;
 import static org.agmip.util.MapUtil.*;
@@ -77,12 +78,10 @@ public abstract class AcmoCommonOutput implements TranslatorOutput {
     }
 
     /**
-     * Translate data str from "yyyymmdd" to "yyddd"
+     * Translate data str from "yyyyddd" to "yyyy-MM-dd"
      *
-     * 2012/3/19 change input format from "yy/mm/dd" to "yyyymmdd"
-     *
-     * @param str date string with format of "yyyymmdd"
-     * @return result date string with format of "yyddd"
+     * @param str date string with format of "yyyyddd"
+     * @return result date string with format of "yyyy-MM-dd"
      */
     protected static String formatDateStr(String str) {
 
@@ -90,21 +89,24 @@ public abstract class AcmoCommonOutput implements TranslatorOutput {
     }
 
     /**
-     * Translate data str from "yyyymmdd" to "yyddd" plus days you want
+     * Translate data str from "yyyyddd" to "yyyy-MM-dd" plus days you want
      *
-     * @param date date string with format of "yyyymmdd"
+     * @param date date string with format of "yyyyddd"
      * @param strDays the number of days need to be added on
      * @return result date string with format of "yyyy-MM-dd"
      */
     protected static String formatDateStr(String date, String seperator) {
 
+        // Initial Calendar object
+        Calendar cal = Calendar.getInstance();
         try {
-            return date.substring(0, 4) + seperator + date.substring(4, 6) + seperator + date.substring(6);
+            // Set date with input value
+            cal.set(Calendar.YEAR, Integer.parseInt(date.substring(0, 4)));
+            cal.set(Calendar.DAY_OF_YEAR, Integer.parseInt(date.substring(4)));
+            return String.format("%1$04d-%2$02d-%3$02d", cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH));
         } catch (Exception e) {
-            log.warn("DATE STRING IS INVALID [" + date + "]");
-            return date;
+            return "";
         }
-
     }
 
     /**
