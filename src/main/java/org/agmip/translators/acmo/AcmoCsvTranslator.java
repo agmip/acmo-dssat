@@ -80,7 +80,6 @@ public class AcmoCsvTranslator {
             String pdat = formatDateStr(getObjectOr(sumSubData, "pdat", ""));
             String exp_id = getObjectOr(ovwSubData, "exp_id", "");
             String key = exp_id + "," + pdat;
-            System.out.println(key);
             if (!runno_sum.equals(runno_ovw)) {
                 log.warn("THE ORDER OF No." + (i + 1) + " RECORD [" + exp_id + "] IS NOT MATCHED BETWEEN SUMMARY AND OVERVIEW OUTPUT FILE");
                 continue;
@@ -124,7 +123,6 @@ public class AcmoCsvTranslator {
             // currently exname (exp_id) is located in the 3rd spot of row
             String[] tmp = line.split(",");
             if (tmp.length < 21 || tmp[3].trim().equals("") || tmp[20].trim().equals("")) {
-//                System.out.println(tmp.length + "," + tmp[3]);
                 bw.write(line);
                 log.warn("MISSING EXNAME OR SDAT IN LINE " + curDataLineNo);
             } else {
@@ -137,12 +135,10 @@ public class AcmoCsvTranslator {
 
                 // wirte simulation output info
                 String scvKey = tmp[3] + "," + tmp[20];
-                System.out.println(scvKey);
                 if (sumValMap.containsKey(scvKey)) {
                     bw.write(sumValMap.remove(scvKey)); // P.S. temporal way for multiple treatment
                 } else {
                     log.warn("THE SIMULATION OUTPUT DATA FOR [" + scvKey + "] IS MISSING");
-
 //                    if (curDataLineNo - 4 < sumValArr.size()) {
 //                        bw.write(sumValArr.get(curDataLineNo - 4));
 //                    } else {
