@@ -87,7 +87,7 @@ public class AcmoCsvTranslator {
 
             // Create CSV data
             if (!sumValMap.containsKey(key)) {
-                sbData.append(",\"DSSAT ").append(getObjectOr(sumSubData, "model", "")).append(" ").append(version).append("\""); // MODEL_VER
+                sbData.append(",\"DSSAT\",\"DSSAT ").append(getObjectOr(sumSubData, "model", "")).append(" ").append(version).append("\""); // MODEL_VER
                 sbData.append(",\"").append(getObjectOr(sumSubData, "hwah", "")).append("\""); // HWAH
                 sbData.append(",\"").append(getObjectOr(sumSubData, "cwam", "")).append("\""); // CWAH
                 sbData.append(",\"").append(formatDateStr(getObjectOr(sumSubData, "adat", ""))).append("\""); // ADAT
@@ -112,6 +112,8 @@ public class AcmoCsvTranslator {
         BufferedWriter bw = new BufferedWriter(new FileWriter(outputFile));
         String line;
         int curDataLineNo = 4;
+        int pdateCol = 20;
+        int exnameCol = 3;
         // Write titles
         for (int i = 1; i < curDataLineNo; i++) {
             bw.write(brCsv.readLine());
@@ -122,22 +124,23 @@ public class AcmoCsvTranslator {
 
             // currently exname (exp_id) is located in the 3rd spot of row
             String[] tmp = line.split(",");
-            if (tmp.length < 21 || tmp[3].trim().equals("") || tmp[20].trim().equals("")) {
+            if (tmp.length < pdateCol + 1 || tmp[exnameCol].trim().equals("") || tmp[pdateCol].trim().equals("")) {
                 bw.write(line);
                 log.warn("MISSING EXNAME OR SDAT IN LINE " + curDataLineNo);
             } else {
-                tmp[20] = tmp[20].replaceAll("/", "-");
+                tmp[pdateCol] = tmp[pdateCol].replaceAll("/", "-");
                 // remove the comma for blank cell which will be filled with output value
                 if (line.endsWith(",")) {
-                    line = trimComma(tmp, 35);
+                    line = trimComma(tmp, 34);
                 }
                 bw.write(line);
 
                 // wirte simulation output info
-                String scvKey = tmp[3] + "," + tmp[20];
+                String scvKey = tmp[exnameCol] + "," + tmp[pdateCol];
                 if (sumValMap.containsKey(scvKey)) {
                     bw.write(sumValMap.remove(scvKey)); // P.S. temporal way for multiple treatment
                 } else {
+                    bw.write(",\"DSSAT\"");
                     log.warn("THE SIMULATION OUTPUT DATA FOR [" + scvKey + "] IS MISSING");
 //                    if (curDataLineNo - 4 < sumValArr.size()) {
 //                        bw.write(sumValArr.get(curDataLineNo - 4));
@@ -162,10 +165,11 @@ public class AcmoCsvTranslator {
     private String trimComma(String[] strs, int length) {
         StringBuilder sb = new StringBuilder();
         sb.append(strs[0]);
-        for (int i = 1; i < strs.length; i++) {
+        int min = Math.min(strs.length, length);
+        for (int i = 1; i < min; i++) {
             sb.append(",").append(strs[i]);
         }
-        for (int i = strs.length; i < length; i++) {
+        for (int i = min; i < length; i++) {
             sb.append(",");
         }
         return sb.toString();
