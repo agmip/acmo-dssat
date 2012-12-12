@@ -111,16 +111,40 @@ public class AcmoCsvTranslator {
         outputFile = new File(outputCsvPath + "ACMO.csv");
         BufferedWriter bw = new BufferedWriter(new FileWriter(outputFile));
         String line;
-        int curDataLineNo = 4;
-        int pdateCol = 20;
-        int exnameCol = 3;
+        String titleLine = "";
+        String[] titles;
+        int curDataLineNo = 1;
         // Write titles
-        for (int i = 1; i < curDataLineNo; i++) {
-            bw.write(brCsv.readLine());
-            bw.write("\r\n");
-        }
-        // Write data
         while ((line = brCsv.readLine()) != null) {
+            if (line.startsWith("*") || line.startsWith("\"*\"")) {
+                break;
+            } else {
+                bw.write(line);
+                bw.write("\r\n");
+                curDataLineNo++;
+                titleLine = line;
+            }
+        }
+
+        // Get titles
+        if (titleLine.endsWith("\"")) {
+            titleLine = titleLine.substring(0, titleLine.length() - 1);
+        }
+        titles = titleLine.split("\"?,\"?");
+
+        // Get key item position
+        int pdateCol = getIndex(titles, "PDATE");
+        int exnameCol = getIndex(titles, "EXNAME");
+        int cropModelCol = getIndex(titles, "CROP_MODEL");
+        if (pdateCol < 0 || exnameCol < 0 || cropModelCol < 0) {
+            log.error("MISSING TITLE FOR PDATE, EXNAME OR CROP_MODEL IN LINE " + (curDataLineNo - 1));
+            bw.write("MISSING TITLE FOR PDATE, EXNAME OR CROP_MODEL IN LINE " + (curDataLineNo - 1));
+            bw.close();
+            return;
+        }
+
+        // Write data
+        while (line != null) {
 
             // currently exname (exp_id) is located in the 3rd spot of row
             String[] tmp = line.split(",");
@@ -131,7 +155,7 @@ public class AcmoCsvTranslator {
                 tmp[pdateCol] = tmp[pdateCol].replaceAll("/", "-");
                 // remove the comma for blank cell which will be filled with output value
                 if (line.endsWith(",")) {
-                    line = trimComma(tmp, 34);
+                    line = trimComma(tmp, cropModelCol);
                 }
                 bw.write(line);
 
@@ -152,15 +176,17 @@ public class AcmoCsvTranslator {
 
             bw.write("\r\n");
             curDataLineNo++;
+            line = brCsv.readLine();
         }
         bw.close();
     }
 
     /**
      * Remove the comma in the end of the line and combine to a new String
-     * @param strs  input array of string which is splited by comma
+     *
+     * @param strs input array of string which is splited by comma
      * @param length the expected length of that array
-     * @return 
+     * @return
      */
     private String trimComma(String[] strs, int length) {
         StringBuilder sb = new StringBuilder();
@@ -173,5 +199,22 @@ public class AcmoCsvTranslator {
             sb.append(",");
         }
         return sb.toString();
+    }
+
+    /**
+     * Get the index number for the targeted title
+     *
+     * @param titles The array of titles
+     * @param name The name of title
+     * @return The index of title in the line
+     */
+    private int getIndex(String[] titles, String name) {
+
+        for (int i = 0; i < titles.length; i++) {
+            if (titles[i].equals(name)) {
+                return i;
+            }
+        }
+        return -1;
     }
 }
