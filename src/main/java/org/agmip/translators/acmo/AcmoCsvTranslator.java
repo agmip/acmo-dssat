@@ -156,8 +156,6 @@ public class AcmoCsvTranslator {
                 tmp[pdateCol] = tmp[pdateCol].replaceAll("/", "");
                 // remove the comma for blank cell which will be filled with output value
                 line = trimComma(tmp, cropModelCol);
-                log.debug(cropModelCol + "");
-                log.debug(line);
                 bw.write(line);
 
                 // wirte simulation output info
