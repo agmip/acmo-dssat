@@ -77,9 +77,10 @@ public class AcmoCsvTranslator {
             ovwSubData = ovwSubArr.get(i);
             String runno_sum = getObjectOr(sumSubData, "runno", "sum");
             String runno_ovw = getObjectOr(ovwSubData, "runno", "ovm");
-            String pdat = formatDateStr(getObjectOr(sumSubData, "pdat", ""));
+            String trno = getObjectOr(ovwSubData, "trno", "1");
+            String pdat = formatDateStr(getObjectOr(sumSubData, "pdat", ""), "");
             String exp_id = getObjectOr(ovwSubData, "exp_id", "");
-            String key = exp_id + "," + pdat;
+            String key = exp_id + "__" + trno + "," + pdat;
             if (!runno_sum.equals(runno_ovw)) {
                 log.warn("THE ORDER OF No." + (i + 1) + " RECORD [" + exp_id + "] IS NOT MATCHED BETWEEN SUMMARY AND OVERVIEW OUTPUT FILE");
                 continue;
@@ -152,14 +153,19 @@ public class AcmoCsvTranslator {
                 bw.write(line);
                 log.warn("MISSING EXNAME OR SDAT IN LINE " + curDataLineNo);
             } else {
-                tmp[pdateCol] = tmp[pdateCol].replaceAll("/", "-");
+                tmp[pdateCol] = tmp[pdateCol].replaceAll("/", "");
                 // remove the comma for blank cell which will be filled with output value
-                if (line.endsWith(",")) {
-                    line = trimComma(tmp, cropModelCol);
-                }
+                line = trimComma(tmp, cropModelCol);
+                log.debug(cropModelCol + "");
+                log.debug(line);
                 bw.write(line);
 
                 // wirte simulation output info
+                if (!tmp[exnameCol].matches("\\w+_+\\d+")) {
+                    tmp[exnameCol] += "__1";
+                } else if (!tmp[exnameCol].matches("\\w+__\\d+")) {
+                    tmp[exnameCol] = tmp[exnameCol].replaceAll("_+", "__");
+                }
                 String scvKey = tmp[exnameCol] + "," + tmp[pdateCol];
                 if (sumValMap.containsKey(scvKey)) {
                     bw.write(sumValMap.remove(scvKey)); // P.S. temporal way for multiple treatment
