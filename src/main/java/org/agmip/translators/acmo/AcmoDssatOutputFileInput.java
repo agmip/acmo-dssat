@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import static org.agmip.util.MapUtil.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DSSAT Output File Data I/O API Class
@@ -37,6 +39,7 @@ public class AcmoDssatOutputFileInput extends AcmoCommonInput {
     protected HashMap readFile(HashMap brMap) throws IOException {
 
         HashMap ret = new HashMap();
+        ret.put("meta", brMap.get("CSV"));
         ret.put("summary", readSummary(brMap));
         ret.put("overview", readOverview(brMap));
 //        ret.put("soilorg", readSoilOrg(brMap));
