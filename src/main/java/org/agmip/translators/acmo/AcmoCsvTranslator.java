@@ -81,6 +81,9 @@ public class AcmoCsvTranslator {
             String pdat = formatDateStr(getObjectOr(sumSubData, "pdat", ""), "");
             String exp_id = getObjectOr(ovwSubData, "exp_id", "");
             String key = exp_id + "__" + trno + "," + pdat;
+            if (Integer.parseInt(runno_sum) > 999) {
+                runno_ovw = (Integer.parseInt(runno_ovw)) + 1000 + "";
+            }
             if (!runno_sum.equals(runno_ovw)) {
                 log.warn("THE ORDER OF No." + (i + 1) + " RECORD [" + exp_id + "] IS NOT MATCHED BETWEEN SUMMARY AND OVERVIEW OUTPUT FILE");
                 continue;
