@@ -23,11 +23,11 @@ import org.slf4j.LoggerFactory;
 public class AcmoDssatCsvOutput extends AcmoCommonOutput {
 
     private static final Logger log = LoggerFactory.getLogger(AcmoDssatCsvOutput.class);
-    private File outputFile;
 
     /**
      * Get output file object
      */
+    @Override
     public File getOutputFile() {
         return outputFile;
     }
@@ -39,13 +39,13 @@ public class AcmoDssatCsvOutput extends AcmoCommonOutput {
      * @param data The data holder for model output data and meta data
      */
     public void writeFile(String outputCsvPath, Map data) throws IOException {
-        
+
         HashMap sumData = getObjectOr(data, "summary", new HashMap());
         ArrayList<HashMap> sumSubArr = getObjectOr(sumData, "data", new ArrayList<HashMap>());
         HashMap sumSubData;
         ArrayList<HashMap> ovwSubArr = getObjectOr(data, "overview", new ArrayList());
         HashMap ovwSubData;
-        
+
         Object buf = data.get("meta");
         BufferedReader brCsv;
         // If Output File File is no been found
@@ -106,7 +106,7 @@ public class AcmoDssatCsvOutput extends AcmoCommonOutput {
 
         // Write CSV File
         outputCsvPath = revisePath(outputCsvPath);
-        outputFile = new File(outputCsvPath + "ACMO.csv");
+        outputFile = createCsvFile(outputCsvPath);
         BufferedWriter bw = new BufferedWriter(new FileWriter(outputFile));
         String line;
         String titleLine = "";
@@ -217,5 +217,16 @@ public class AcmoDssatCsvOutput extends AcmoCommonOutput {
             }
         }
         return -1;
+    }
+
+    private File createCsvFile(String outputCsvPath) {
+        File f = new File(outputCsvPath + "ACMO.csv");
+        int count = 1;
+        while (f.exists()) {
+            f = new File(outputCsvPath + "ACMO (" + count + ").csv");
+            count++;
+        }
+        System.out.println(f.getPath());
+        return f;
     }
 }
