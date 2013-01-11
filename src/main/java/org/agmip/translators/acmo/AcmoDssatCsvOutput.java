@@ -226,7 +226,6 @@ public class AcmoDssatCsvOutput extends AcmoCommonOutput {
             f = new File(outputCsvPath + "ACMO (" + count + ").csv");
             count++;
         }
-        System.out.println(f.getPath());
         return f;
     }
 }
