@@ -45,6 +45,10 @@ public class AcmoDssatCsvOutput extends AcmoCommonOutput {
         HashMap sumSubData;
         ArrayList<HashMap> ovwSubArr = getObjectOr(data, "overview", new ArrayList());
         HashMap ovwSubData;
+        if (sumSubArr.size() != ovwSubArr.size()) {
+            log.error("THE RECORDS IS NOT MATCHED BETWEEN SUMMARY.OUT AND OVERVIEW.OUT");
+            return;
+        }
 
         Object buf = data.get("meta");
         BufferedReader brCsv;
