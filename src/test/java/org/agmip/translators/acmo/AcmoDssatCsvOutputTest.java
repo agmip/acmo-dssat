@@ -3,6 +3,7 @@ package org.agmip.translators.acmo;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,25 +15,28 @@ import org.junit.Test;
  *
  * @author Meng Zhang
  */
-public class AcmoCsvTranslatorTest {
+public class AcmoDssatCsvOutputTest {
 
-    AcmoCsvTranslator obDssatAcmoCsvTanslator;
+    AcmoDssatCsvOutput obDssatAcmoCsvTanslator;
+    AcmoDssatOutputFileInput obAcmoDssatOutputFileInput;
     URL resource;
 
     @Before
     public void setUp() throws Exception {
-        obDssatAcmoCsvTanslator = new AcmoCsvTranslator();
+        obDssatAcmoCsvTanslator = new AcmoDssatCsvOutput();
+        obAcmoDssatOutputFileInput = new AcmoDssatOutputFileInput();
         resource = this.getClass().getClassLoader().getResource("testCsv.zip");
     }
 
     @Test
     public void test() throws IOException, Exception {
 
-        obDssatAcmoCsvTanslator.writeCsvFile("", resource.getPath());
+        HashMap result = obAcmoDssatOutputFileInput.readFile(resource.getPath());
+        obDssatAcmoCsvTanslator.writeFile("", result);
         File file = obDssatAcmoCsvTanslator.getOutputFile();
         if (file != null) {
             assertTrue(file.exists());
-            assertTrue(file.getName().equals("ACMO.csv"));
+            assertTrue(file.getName().matches("ACMO( \\(\\d\\))*.csv"));
 //            assertTrue(file.delete());
         }
     }

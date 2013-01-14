@@ -211,7 +211,7 @@ public abstract class AcmoCommonInput implements TranslatorInput {
                     
                     if (entry.getName().toUpperCase().endsWith(".OUT")) {
                         result.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
-                    } else if (entry.getName().toUpperCase().endsWith(".CSV")) {
+                    } else if (entry.getName().toUpperCase().equals("ACMO_META.DAT")) {
                         result.put("CSV", getBuf(in, (int) entry.getSize()));
                     } else if (entry.getName().toUpperCase().endsWith(".JSON")) {
                         result.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));

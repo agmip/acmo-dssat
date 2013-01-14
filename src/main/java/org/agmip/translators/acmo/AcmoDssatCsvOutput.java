@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import static org.agmip.translators.acmo.AcmoCommonOutput.*;
 import static org.agmip.util.MapUtil.*;
 import org.slf4j.Logger;
@@ -19,14 +20,14 @@ import org.slf4j.LoggerFactory;
  * @author Meng Zhang
  * @version 1.0
  */
-public class AcmoCsvTranslator {
+public class AcmoDssatCsvOutput extends AcmoCommonOutput {
 
-    private static final Logger log = LoggerFactory.getLogger(AcmoCommonInput.class);
-    private File outputFile;
+    private static final Logger log = LoggerFactory.getLogger(AcmoDssatCsvOutput.class);
 
     /**
      * Get output file object
      */
+    @Override
     public File getOutputFile() {
         return outputFile;
     }
@@ -35,16 +36,21 @@ public class AcmoCsvTranslator {
      * Generate ACMO CSV file
      *
      * @param outputCsvPath The path for output csv file
-     * @param inputFilePath The path for input zip file which contains *.OUT and
-     * acmo.json
+     * @param data The data holder for model output data and meta data
      */
-    public void writeCsvFile(String outputCsvPath, String inputFilePath) throws IOException {
+    public void writeFile(String outputCsvPath, Map data) throws IOException {
 
-        // Read input zip file
-        HashMap brMap = AcmoCommonInput.getBufferReader(inputFilePath);
+        HashMap sumData = getObjectOr(data, "summary", new HashMap());
+        ArrayList<HashMap> sumSubArr = getObjectOr(sumData, "data", new ArrayList<HashMap>());
+        HashMap sumSubData;
+        ArrayList<HashMap> ovwSubArr = getObjectOr(data, "overview", new ArrayList());
+        HashMap ovwSubData;
+        if (sumSubArr.size() != ovwSubArr.size()) {
+            log.error("THE RECORDS IS NOT MATCHED BETWEEN SUMMARY.OUT AND OVERVIEW.OUT");
+            return;
+        }
 
-        // Get input csv file from zip
-        Object buf = brMap.get("CSV");
+        Object buf = data.get("meta");
         BufferedReader brCsv;
         // If Output File File is no been found
         if (buf == null) {
@@ -58,14 +64,6 @@ public class AcmoCsvTranslator {
             }
         }
 
-        // Get input dssat simulation ouput files from zip
-        AcmoDssatOutputFileInput dssatReader = new AcmoDssatOutputFileInput();
-        HashMap sumData = dssatReader.readSummary(brMap);
-        ArrayList<HashMap> sumSubArr = getObjectOr(sumData, "data", new ArrayList<HashMap>());
-        HashMap sumSubData;
-        ArrayList<HashMap> ovwSubArr = dssatReader.readOverview(brMap);
-        HashMap ovwSubData;
-
         // Get simulation output values from output files by experiment id
         HashMap<String, String> sumValMap = new HashMap();
 //        ArrayList<String> sumValArr = new ArrayList();
@@ -77,9 +75,13 @@ public class AcmoCsvTranslator {
             ovwSubData = ovwSubArr.get(i);
             String runno_sum = getObjectOr(sumSubData, "runno", "sum");
             String runno_ovw = getObjectOr(ovwSubData, "runno", "ovm");
-            String pdat = formatDateStr(getObjectOr(sumSubData, "pdat", ""));
+            String trno = getObjectOr(ovwSubData, "trno", "1");
+            String pdat = formatDateStr(getObjectOr(sumSubData, "pdat", ""), "");
             String exp_id = getObjectOr(ovwSubData, "exp_id", "");
-            String key = exp_id + "," + pdat;
+            String key = exp_id + "__" + trno + "," + pdat;
+            if (Integer.parseInt(runno_sum) > 999) {
+                runno_ovw = (Integer.parseInt(runno_ovw)) + 1000 + "";
+            }
             if (!runno_sum.equals(runno_ovw)) {
                 log.warn("THE ORDER OF No." + (i + 1) + " RECORD [" + exp_id + "] IS NOT MATCHED BETWEEN SUMMARY AND OVERVIEW OUTPUT FILE");
                 continue;
@@ -108,7 +110,7 @@ public class AcmoCsvTranslator {
 
         // Write CSV File
         outputCsvPath = revisePath(outputCsvPath);
-        outputFile = new File(outputCsvPath + "ACMO.csv");
+        outputFile = createCsvFile(outputCsvPath);
         BufferedWriter bw = new BufferedWriter(new FileWriter(outputFile));
         String line;
         String titleLine = "";
@@ -152,14 +154,17 @@ public class AcmoCsvTranslator {
                 bw.write(line);
                 log.warn("MISSING EXNAME OR SDAT IN LINE " + curDataLineNo);
             } else {
-                tmp[pdateCol] = tmp[pdateCol].replaceAll("/", "-");
+                tmp[pdateCol] = tmp[pdateCol].replaceAll("/", "");
                 // remove the comma for blank cell which will be filled with output value
-                if (line.endsWith(",")) {
-                    line = trimComma(tmp, cropModelCol);
-                }
+                line = trimComma(tmp, cropModelCol);
                 bw.write(line);
 
                 // wirte simulation output info
+                if (!tmp[exnameCol].matches("\\w+_+\\d+")) {
+                    tmp[exnameCol] += "__1";
+                } else if (!tmp[exnameCol].matches("\\w+__\\d+")) {
+                    tmp[exnameCol] = tmp[exnameCol].replaceAll("_+", "__");
+                }
                 String scvKey = tmp[exnameCol] + "," + tmp[pdateCol];
                 if (sumValMap.containsKey(scvKey)) {
                     bw.write(sumValMap.remove(scvKey)); // P.S. temporal way for multiple treatment
@@ -216,5 +221,15 @@ public class AcmoCsvTranslator {
             }
         }
         return -1;
+    }
+
+    private File createCsvFile(String outputCsvPath) {
+        File f = new File(outputCsvPath + "ACMO.csv");
+        int count = 1;
+        while (f.exists()) {
+            f = new File(outputCsvPath + "ACMO (" + count + ").csv");
+            count++;
+        }
+        return f;
     }
 }
