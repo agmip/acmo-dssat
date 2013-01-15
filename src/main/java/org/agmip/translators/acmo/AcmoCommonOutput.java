@@ -98,10 +98,16 @@ public abstract class AcmoCommonOutput implements TranslatorOutput {
 
         // Initial Calendar object
         Calendar cal = Calendar.getInstance();
+        date = date.replaceAll("\\D", "");
         try {
             // Set date with input value
             cal.set(Calendar.YEAR, Integer.parseInt(date.substring(0, 4)));
-            cal.set(Calendar.DAY_OF_YEAR, Integer.parseInt(date.substring(4)));
+            if (date.length() == 8) {
+                cal.set(Calendar.MONTH, Integer.parseInt(date.substring(4, 6)) - 1);
+                cal.set(Calendar.DATE, Integer.parseInt(date.substring(6)));
+            } else {
+                cal.set(Calendar.DAY_OF_YEAR, Integer.parseInt(date.substring(4)));
+            }
             return String.format("%1$04d" + seperator + "%2$02d" + seperator + "%3$02d", cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH));
         } catch (Exception e) {
             return "";

@@ -76,7 +76,7 @@ public class AcmoDssatCsvOutput extends AcmoCommonOutput {
             String runno_sum = getObjectOr(sumSubData, "runno", "sum");
             String runno_ovw = getObjectOr(ovwSubData, "runno", "ovm");
             String trno = getObjectOr(ovwSubData, "trno", "1");
-            String pdat = formatDateStr(getObjectOr(sumSubData, "pdat", ""), "");
+            String pdat = formatDateStr(getObjectOr(sumSubData, "pdat", ""));
             String exp_id = getObjectOr(ovwSubData, "exp_id", "");
             String key = exp_id + "__" + trno + "," + pdat;
             if (Integer.parseInt(runno_sum) > 999) {
@@ -136,6 +136,8 @@ public class AcmoDssatCsvOutput extends AcmoCommonOutput {
 
         // Get key item position
         int pdateCol = getIndex(titles, "PDATE");
+        int sdatCol = getIndex(titles, "SDAT");
+        int hdateCol = getIndex(titles, "HDATE");
         int exnameCol = getIndex(titles, "EXNAME");
         int cropModelCol = getIndex(titles, "CROP_MODEL");
         if (pdateCol < 0 || exnameCol < 0 || cropModelCol < 0) {
@@ -154,7 +156,9 @@ public class AcmoDssatCsvOutput extends AcmoCommonOutput {
                 bw.write(line);
                 log.warn("MISSING EXNAME OR SDAT IN LINE " + curDataLineNo);
             } else {
-                tmp[pdateCol] = tmp[pdateCol].replaceAll("/", "");
+                tmp[pdateCol] = formatDateStr(tmp[pdateCol]);
+                tmp[sdatCol] = formatDateStr(tmp[sdatCol]);
+                tmp[hdateCol] = formatDateStr(tmp[hdateCol]);
                 // remove the comma for blank cell which will be filled with output value
                 line = trimComma(tmp, cropModelCol);
                 bw.write(line);
