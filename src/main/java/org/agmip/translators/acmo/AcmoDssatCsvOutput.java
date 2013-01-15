@@ -139,7 +139,7 @@ public class AcmoDssatCsvOutput extends AcmoCommonOutput {
 
         // Check if there is record not been output yet
         if (index != sumSubArr.size()) {
-            log.warn("The recoreds in Summary.out are not match with the ones in meta data.");
+            log.warn("The number of records in Summary.out does not match the metadata.");
         }
 
         bw.close();
