@@ -228,10 +228,10 @@ public class AcmoDssatCsvOutput extends AcmoCommonOutput {
     }
 
     private File createCsvFile(String outputCsvPath) {
-        File f = new File(outputCsvPath + "ACMO.csv");
+        File f = new File(outputCsvPath + "ACMO_DSSAT.csv");
         int count = 1;
         while (f.exists()) {
-            f = new File(outputCsvPath + "ACMO (" + count + ").csv");
+            f = new File(outputCsvPath + "ACMO_DSSAT (" + count + ").csv");
             count++;
         }
         return f;

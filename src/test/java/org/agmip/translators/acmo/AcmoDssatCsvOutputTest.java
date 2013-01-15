@@ -36,7 +36,7 @@ public class AcmoDssatCsvOutputTest {
         File file = obDssatAcmoCsvTanslator.getOutputFile();
         if (file != null) {
             assertTrue(file.exists());
-            assertTrue(file.getName().matches("ACMO( \\(\\d\\))*.csv"));
+            assertTrue(file.getName().matches("ACMO_DSSAT( \\(\\d\\))*.csv"));
 //            assertTrue(file.delete());
         }
     }
