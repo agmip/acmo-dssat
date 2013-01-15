@@ -220,14 +220,33 @@ public abstract class AcmoCommonInput implements TranslatorInput {
             }
         } // If input File is not ZIP file
         else {
-            in = new FileInputStream(filePath);
             File f = new File(filePath);
-            if (f.getName().toUpperCase().endsWith(".OUT")) {
-                result.put(f.getName().toUpperCase(), new BufferedReader(new InputStreamReader(in)));
-            } else if (f.getName().toUpperCase().endsWith(".CSV")) {
-                result.put("CSV", new BufferedReader(new InputStreamReader(in)));
-            } else if (filePath.toUpperCase().endsWith(".JSON")) {
-                result.put(f.getName().toUpperCase(), new BufferedReader(new InputStreamReader(in)));
+            if (f.isDirectory()) {
+                File[] files = f.listFiles();
+                for (int i = 0; i < files.length; i++) {
+                    if (files[i].getName().toUpperCase().equals("SUMMARY.OUT")) {
+                        in = new FileInputStream(files[i].getPath());
+                        result.put("SUMMARY.OUT", new BufferedReader(new InputStreamReader(in)));
+//                    } else if (files[i].getName().toUpperCase().equals("OVERVIEW.OUT")) {
+//                        in = new FileInputStream(files[i].getPath());
+//                        result.put("OVERVIEW.OUT", new BufferedReader(new InputStreamReader(in)));
+                    } else if (files[i].getName().toUpperCase().equals("ACMO_META.DAT")) {
+                        in = new FileInputStream(files[i].getPath());
+                        result.put("CSV", new BufferedReader(new InputStreamReader(in)));
+                    } else if (filePath.toUpperCase().endsWith(".JSON")) {
+                        in = new FileInputStream(files[i].getPath());
+                        result.put(files[i].getName().toUpperCase(), new BufferedReader(new InputStreamReader(in)));
+                    }
+                }
+            } else {
+                in = new FileInputStream(filePath);
+                if (f.getName().toUpperCase().endsWith(".OUT")) {
+                    result.put(f.getName().toUpperCase(), new BufferedReader(new InputStreamReader(in)));
+                } else if (f.getName().toUpperCase().equals("ACMO_META.DAT")) {
+                    result.put("CSV", new BufferedReader(new InputStreamReader(in)));
+                } else if (filePath.toUpperCase().endsWith(".JSON")) {
+                    result.put(f.getName().toUpperCase(), new BufferedReader(new InputStreamReader(in)));
+                }
             }
         }
 

@@ -43,18 +43,12 @@ public class AcmoDssatCsvOutput extends AcmoCommonOutput {
         HashMap sumData = getObjectOr(data, "summary", new HashMap());
         ArrayList<HashMap> sumSubArr = getObjectOr(sumData, "data", new ArrayList<HashMap>());
         HashMap sumSubData;
-        ArrayList<HashMap> ovwSubArr = getObjectOr(data, "overview", new ArrayList());
-        HashMap ovwSubData;
-        if (sumSubArr.size() != ovwSubArr.size()) {
-            log.error("THE RECORDS IS NOT MATCHED BETWEEN SUMMARY.OUT AND OVERVIEW.OUT");
-            return;
-        }
 
         Object buf = data.get("meta");
         BufferedReader brCsv;
         // If Output File File is no been found
         if (buf == null) {
-            log.error("CSV FILE IS MISSING IN THE INPUT ZIP PACKAGE");
+            log.error("META DATA FILE IS MISSING");
             return;
         } else {
             if (buf instanceof char[]) {
@@ -64,49 +58,9 @@ public class AcmoDssatCsvOutput extends AcmoCommonOutput {
             }
         }
 
-        // Get simulation output values from output files by experiment id
-        HashMap<String, String> sumValMap = new HashMap();
-//        ArrayList<String> sumValArr = new ArrayList();
+        // Get Model version
         String version = getObjectOr(sumData, "vevsion", "Ver. N/A");
         StringBuilder sbData;
-        for (int i = 0; i < sumSubArr.size(); i++) {
-            sbData = new StringBuilder();
-            sumSubData = sumSubArr.get(i);
-            ovwSubData = ovwSubArr.get(i);
-            String runno_sum = getObjectOr(sumSubData, "runno", "sum");
-            String runno_ovw = getObjectOr(ovwSubData, "runno", "ovm");
-            String trno = getObjectOr(ovwSubData, "trno", "1");
-            String pdat = formatDateStr(getObjectOr(sumSubData, "pdat", ""));
-            String exp_id = getObjectOr(ovwSubData, "exp_id", "");
-            String key = exp_id + "__" + trno + "," + pdat;
-            if (Integer.parseInt(runno_sum) > 999) {
-                runno_ovw = (Integer.parseInt(runno_ovw)) + 1000 + "";
-            }
-            if (!runno_sum.equals(runno_ovw)) {
-                log.warn("THE ORDER OF No." + (i + 1) + " RECORD [" + exp_id + "] IS NOT MATCHED BETWEEN SUMMARY AND OVERVIEW OUTPUT FILE");
-                continue;
-            }
-
-            // Create CSV data
-            if (!sumValMap.containsKey(key)) {
-                sbData.append(",\"DSSAT\",\"DSSAT ").append(getObjectOr(sumSubData, "model", "")).append(" ").append(version).append("\""); // MODEL_VER
-                sbData.append(",\"").append(getObjectOr(sumSubData, "hwah", "")).append("\""); // HWAH
-                sbData.append(",\"").append(getObjectOr(sumSubData, "cwam", "")).append("\""); // CWAH
-                sbData.append(",\"").append(formatDateStr(getObjectOr(sumSubData, "adat", ""))).append("\""); // ADAT
-                sbData.append(",\"").append(formatDateStr(getObjectOr(sumSubData, "mdat", ""))).append("\""); // MDAT
-                sbData.append(",\"").append(formatDateStr(getObjectOr(sumSubData, "hdat", ""))).append("\""); // HDATE
-                sbData.append(",\"").append(getObjectOr(sumSubData, "laix", "")).append("\""); // LAIX
-                sbData.append(",\"").append(getObjectOr(sumSubData, "prcp", "")).append("\""); // PRCP
-                sbData.append(",\"").append(getObjectOr(sumSubData, "etcp", "")).append("\""); // ETCP
-                sbData.append(",\"").append(getObjectOr(sumSubData, "nucm", "")).append("\""); // NUCM
-                sbData.append(",\"").append(getObjectOr(sumSubData, "nlcm", "")).append("\""); // NLCM
-                sumValMap.put(key, sbData.toString()); // P.S. since non-DSSAT model won't have multiple treament, thus trno is not used as the part of key
-            } else {
-                log.warn("REPEATED RECORD IN SUMMARY FILE WITH SAME PDAT AND EXNAME");
-            }
-//            sumValArr.add(sbData.toString());
-
-        }
 
         // Write CSV File
         outputCsvPath = revisePath(outputCsvPath);
@@ -115,7 +69,7 @@ public class AcmoDssatCsvOutput extends AcmoCommonOutput {
         String line;
         String titleLine = "";
         String[] titles;
-        int curDataLineNo = 1;
+//        int curDataLineNo = 1;
         // Write titles
         while ((line = brCsv.readLine()) != null) {
             if (line.startsWith("*") || line.startsWith("\"*\"")) {
@@ -123,7 +77,7 @@ public class AcmoDssatCsvOutput extends AcmoCommonOutput {
             } else {
                 bw.write(line);
                 bw.write("\r\n");
-                curDataLineNo++;
+//                curDataLineNo++;
                 titleLine = line;
             }
         }
@@ -138,55 +92,56 @@ public class AcmoDssatCsvOutput extends AcmoCommonOutput {
         int pdateCol = getIndex(titles, "PDATE");
         int sdatCol = getIndex(titles, "SDAT");
         int hdateCol = getIndex(titles, "HDATE");
-        int exnameCol = getIndex(titles, "EXNAME");
         int cropModelCol = getIndex(titles, "CROP_MODEL");
-        if (pdateCol < 0 || exnameCol < 0 || cropModelCol < 0) {
-            log.error("MISSING TITLE FOR PDATE, EXNAME OR CROP_MODEL IN LINE " + (curDataLineNo - 1));
-            bw.write("MISSING TITLE FOR PDATE, EXNAME OR CROP_MODEL IN LINE " + (curDataLineNo - 1));
+        if (cropModelCol < 0) {
+            log.error("MISSING TITLE <CROP_MODEL> TO LOCATE OUTPUT POSITION");
+            bw.write("MISSING TITLE <CROP_MODEL> TO LOCATE OUTPUT POSITION");
             bw.close();
             return;
         }
 
         // Write data
-        while (line != null) {
-
-            // currently exname (exp_id) is located in the 3rd spot of row
+        int index = 0;
+        do {
+            // Check if the index is over the limitation.
             String[] tmp = line.split(",");
-            if (tmp.length < pdateCol + 1 || tmp[exnameCol].trim().equals("") || tmp[pdateCol].trim().equals("")) {
-                bw.write(line);
-                log.warn("MISSING EXNAME OR SDAT IN LINE " + curDataLineNo);
-            } else {
-                tmp[pdateCol] = formatDateStr(tmp[pdateCol]);
-                tmp[sdatCol] = formatDateStr(tmp[sdatCol]);
-                tmp[hdateCol] = formatDateStr(tmp[hdateCol]);
-                // remove the comma for blank cell which will be filled with output value
-                line = trimComma(tmp, cropModelCol);
-                bw.write(line);
+            tmp[pdateCol] = formatDateStr(tmp[pdateCol]);
+            tmp[sdatCol] = formatDateStr(tmp[sdatCol]);
+            tmp[hdateCol] = formatDateStr(tmp[hdateCol]);
+            // remove the comma for blank cell which will be filled with output value
+            line = trimComma(tmp, cropModelCol);
+            bw.write(line);
 
-                // wirte simulation output info
-                if (!tmp[exnameCol].matches("\\w+_+\\d+")) {
-                    tmp[exnameCol] += "__1";
-                } else if (!tmp[exnameCol].matches("\\w+__\\d+")) {
-                    tmp[exnameCol] = tmp[exnameCol].replaceAll("_+", "__");
-                }
-                String scvKey = tmp[exnameCol] + "," + tmp[pdateCol];
-                if (sumValMap.containsKey(scvKey)) {
-                    bw.write(sumValMap.remove(scvKey)); // P.S. temporal way for multiple treatment
-                } else {
-                    bw.write(",\"DSSAT\"");
-                    log.warn("THE SIMULATION OUTPUT DATA FOR [" + scvKey + "] IS MISSING");
-//                    if (curDataLineNo - 4 < sumValArr.size()) {
-//                        bw.write(sumValArr.get(curDataLineNo - 4));
-//                    } else {
-//                        log.warn("THE SIMULATION OUTPUT DATA FOR [" + tmp[2] + "] IS MISSING");
-//                    }
-                }
+            // wirte simulation output info
+            if (index >= sumSubArr.size()) {
+                bw.write(",\"DSSAT\"");
+            } else {
+                sbData = new StringBuilder();
+                sumSubData = sumSubArr.get(index);
+                sbData.append(",\"DSSAT\",\"DSSAT ").append(getObjectOr(sumSubData, "model", "")).append(" ").append(version).append("\""); // MODEL_VER
+                sbData.append(",\"").append(getObjectOr(sumSubData, "hwah", "")).append("\""); // HWAH
+                sbData.append(",\"").append(getObjectOr(sumSubData, "cwam", "")).append("\""); // CWAH
+                sbData.append(",\"").append(formatDateStr(getObjectOr(sumSubData, "adat", ""))).append("\""); // ADAT
+                sbData.append(",\"").append(formatDateStr(getObjectOr(sumSubData, "mdat", ""))).append("\""); // MDAT
+                sbData.append(",\"").append(formatDateStr(getObjectOr(sumSubData, "hdat", ""))).append("\""); // HDATE
+                sbData.append(",\"").append(getObjectOr(sumSubData, "laix", "")).append("\""); // LAIX
+                sbData.append(",\"").append(getObjectOr(sumSubData, "prcp", "")).append("\""); // PRCP
+                sbData.append(",\"").append(getObjectOr(sumSubData, "etcp", "")).append("\""); // ETCP
+                sbData.append(",\"").append(getObjectOr(sumSubData, "nucm", "")).append("\""); // NUCM
+                sbData.append(",\"").append(getObjectOr(sumSubData, "nlcm", "")).append("\""); // NLCM
+                bw.write(sbData.toString());
             }
 
             bw.write("\r\n");
-            curDataLineNo++;
-            line = brCsv.readLine();
+//            curDataLineNo++;
+            index++;
+        } while((line = brCsv.readLine()) != null);
+
+        // Check if there is record not been output yet
+        if (index != sumSubArr.size()) {
+            log.warn("The recoreds in Summary.out are not match with the ones in meta data.");
         }
+
         bw.close();
     }
 

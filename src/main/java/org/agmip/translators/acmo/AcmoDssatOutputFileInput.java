@@ -41,7 +41,7 @@ public class AcmoDssatOutputFileInput extends AcmoCommonInput {
         HashMap ret = new HashMap();
         ret.put("meta", brMap.get("CSV"));
         ret.put("summary", readSummary(brMap));
-        ret.put("overview", readOverview(brMap));
+//        ret.put("overview", readOverview(brMap));
 //        ret.put("soilorg", readSoilOrg(brMap));
         return ret;
     }
