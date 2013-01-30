@@ -9,4 +9,4 @@ pretty_print*
 target/*
 *.tmp
 .DS_Store
-ACMO_DSSAT.csv
+ACMO_DSSAT*.csv
