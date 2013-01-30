@@ -67,58 +67,29 @@ public class AcmoDssatCsvOutput extends AcmoCommonOutput {
         outputFile = createCsvFile(outputCsvPath);
         BufferedWriter bw = new BufferedWriter(new FileWriter(outputFile));
         String line;
-        String titleLine = "";
-        String[] titles;
-//        int curDataLineNo = 1;
-        // Write titles
         while ((line = brCsv.readLine()) != null) {
             if (line.startsWith("*") || line.startsWith("\"*\"")) {
                 break;
             } else {
                 bw.write(line);
                 bw.write("\r\n");
-//                curDataLineNo++;
-                titleLine = line;
             }
-        }
-
-        // Get titles
-        if (titleLine.endsWith("\"")) {
-            titleLine = titleLine.substring(0, titleLine.length() - 1);
-        }
-        titles = titleLine.split("\"?,\"?");
-
-        // Get key item position
-        int pdateCol = getIndex(titles, "PDATE");
-        int sdatCol = getIndex(titles, "SDAT");
-        int hdateCol = getIndex(titles, "HDATE");
-        int cropModelCol = getIndex(titles, "CROP_MODEL");
-        if (cropModelCol < 0) {
-            log.error("MISSING TITLE <CROP_MODEL> TO LOCATE OUTPUT POSITION");
-            bw.write("MISSING TITLE <CROP_MODEL> TO LOCATE OUTPUT POSITION");
-            bw.close();
-            return;
         }
 
         // Write data
         int index = 0;
         do {
-            // Check if the index is over the limitation.
-            String[] tmp = line.split(",");
-            tmp[pdateCol] = formatDateStr(tmp[pdateCol]);
-            tmp[sdatCol] = formatDateStr(tmp[sdatCol]);
-            tmp[hdateCol] = formatDateStr(tmp[hdateCol]);
-            // remove the comma for blank cell which will be filled with output value
-            line = trimComma(tmp, cropModelCol);
+            // Check if the line is ended with comma
+            if (line.endsWith(",") && line.matches(".+,[^,]+,$")) {
+                line = line.substring(0, line.length() - 1);
+            }
             bw.write(line);
 
             // wirte simulation output info
-            if (index >= sumSubArr.size()) {
-                bw.write(",\"DSSAT\"");
-            } else {
+            if (index < sumSubArr.size()) {
                 sbData = new StringBuilder();
                 sumSubData = sumSubArr.get(index);
-                sbData.append(",\"DSSAT\",\"DSSAT ").append(getObjectOr(sumSubData, "model", "")).append(" ").append(version).append("\""); // MODEL_VER
+                sbData.append(",\"DSSAT ").append(getObjectOr(sumSubData, "model", "")).append(" ").append(version).append("\""); // MODEL_VER
                 sbData.append(",\"").append(getObjectOr(sumSubData, "hwah", "")).append("\""); // HWAH
                 sbData.append(",\"").append(getObjectOr(sumSubData, "cwam", "")).append("\""); // CWAH
                 sbData.append(",\"").append(formatDateStr(getObjectOr(sumSubData, "adat", ""))).append("\""); // ADAT
@@ -133,7 +104,6 @@ public class AcmoDssatCsvOutput extends AcmoCommonOutput {
             }
 
             bw.write("\r\n");
-//            curDataLineNo++;
             index++;
         } while((line = brCsv.readLine()) != null);
 
@@ -143,43 +113,6 @@ public class AcmoDssatCsvOutput extends AcmoCommonOutput {
         }
 
         bw.close();
-    }
-
-    /**
-     * Remove the comma in the end of the line and combine to a new String
-     *
-     * @param strs input array of string which is splited by comma
-     * @param length the expected length of that array
-     * @return
-     */
-    private String trimComma(String[] strs, int length) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(strs[0]);
-        int min = Math.min(strs.length, length);
-        for (int i = 1; i < min; i++) {
-            sb.append(",").append(strs[i]);
-        }
-        for (int i = min; i < length; i++) {
-            sb.append(",");
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Get the index number for the targeted title
-     *
-     * @param titles The array of titles
-     * @param name The name of title
-     * @return The index of title in the line
-     */
-    private int getIndex(String[] titles, String name) {
-
-        for (int i = 0; i < titles.length; i++) {
-            if (titles[i].equals(name)) {
-                return i;
-            }
-        }
-        return -1;
     }
 
     private File createCsvFile(String outputCsvPath) {
