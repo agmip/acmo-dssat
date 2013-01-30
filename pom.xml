@@ -5,9 +5,9 @@
     <artifactId>translator-acmo</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>translator-acmo</name>
+    <name>acmo-dssat</name>
     <description>
-        AgMIP ACMO Translator
+        DSSAT ACMO Translator
     </description>
     <url>http://www.agmip.org/</url>
 
@@ -22,7 +22,7 @@
 
     <licenses>
         <license>
-            <url>http://raw.github.com/agmip/translator-acmo/LICENSE</url>
+            <url>http://raw.github.com/agmip/acmo-dssat/LICENSE</url>
         </license>
     </licenses>
 
@@ -49,7 +49,7 @@
         <dependency>
             <groupId>org.agmip</groupId>
             <artifactId>agmip-core</artifactId>
-            <version>0.15-SNAPSHOT</version>
+            <version>1.0.2</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
