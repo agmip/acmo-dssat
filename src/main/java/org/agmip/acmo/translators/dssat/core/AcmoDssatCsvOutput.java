@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import static org.agmip.acmo.translators.dssat.core.AcmoCommonOutput.*;
+import org.agmip.acmo.util.AcmoUtil;
 import static org.agmip.util.MapUtil.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +66,7 @@ public class AcmoDssatCsvOutput extends AcmoCommonOutput {
 
         // Write CSV File
         outputCsvPath = revisePath(outputCsvPath);
-        outputFile = createCsvFile(outputCsvPath);
+        outputFile = AcmoUtil.createCsvFile(outputCsvPath, "DSSAT");
         BufferedWriter bw = new BufferedWriter(new FileWriter(outputFile));
         String line;
         while ((line = brCsv.readLine()) != null) {
@@ -114,15 +115,5 @@ public class AcmoDssatCsvOutput extends AcmoCommonOutput {
         }
 
         bw.close();
-    }
-
-    private File createCsvFile(String outputCsvPath) {
-        File f = new File(outputCsvPath + "ACMO_DSSAT.csv");
-        int count = 1;
-        while (f.exists()) {
-            f = new File(outputCsvPath + "ACMO_DSSAT (" + count + ").csv");
-            count++;
-        }
-        return f;
     }
 }
