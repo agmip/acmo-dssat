@@ -1,4 +1,4 @@
-package org.agmip.translators.acmo;
+package org.agmip.acmo.translators.dssat.core;
 
 import java.io.File;
 import java.util.Calendar;
@@ -31,7 +31,9 @@ public abstract class AcmoCommonOutput implements TranslatorOutput {
      * Format the number with maximum length and type
      *
      * @param bits Maximum length of the output string
-     * @param str Input string of number
+     * @param m Data set
+     * @param key The key to find item from data set
+     * @param defVal default value, will be applied  when candidate is invalid
      * @return formated string of number
      */
     protected String formatNumStr(int bits, HashMap m, Object key, String defVal) {
@@ -91,10 +93,10 @@ public abstract class AcmoCommonOutput implements TranslatorOutput {
      * Translate data str from "yyyyddd" to "yyyy-MM-dd" plus days you want
      *
      * @param date date string with format of "yyyyddd"
-     * @param strDays the number of days need to be added on
+     * @param separator the separator string
      * @return result date string with format of "yyyy-MM-dd"
      */
-    protected static String formatDateStr(String date, String seperator) {
+    protected static String formatDateStr(String date, String separator) {
 
         // Initial Calendar object
         Calendar cal = Calendar.getInstance();
@@ -108,7 +110,7 @@ public abstract class AcmoCommonOutput implements TranslatorOutput {
             } else {
                 cal.set(Calendar.DAY_OF_YEAR, Integer.parseInt(date.substring(4)));
             }
-            return String.format("%1$04d" + seperator + "%2$02d" + seperator + "%3$02d", cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH));
+            return String.format("%1$04d" + separator + "%2$02d" + separator + "%3$02d", cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH));
         } catch (Exception e) {
             return "";
         }
