@@ -92,14 +92,17 @@ public class AcmoDssatOutputFileInput extends AcmoCommonInput {
                     formats.put("exname", 10);
                     formats.put("local_name", 62);
                     formats.put("null_2", 28);
-                    formats.put("vevsion", 28);
+                    formats.put("version", 28);
                     formats.put("date", line.length());
                     // Read line and save into return holder
                     HashMap tmp = readLine(line, formats);
                     String date = getObjectOr(tmp, "date", "");
                     String version = getObjectOr(tmp, "version", "");
                     if (date.length() > 22) {
-                        version += date.substring(0, date.length() - 22);
+                        version += date.substring(0, date.length() - 22).trim();
+                        tmp.put("version", version);
+                    } else if (date.length() < 22) {
+                        version = version.substring(0, version.length() - 22 + date.length()).trim();
                         tmp.put("version", version);
                     }
                     file.putAll(tmp);

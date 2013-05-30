@@ -61,7 +61,7 @@ public class AcmoDssatCsvOutput extends AcmoCommonOutput {
         }
 
         // Get Model version
-        String version = getObjectOr(sumData, "vevsion", "Ver. N/A");
+        String version = getObjectOr(sumData, "version", "Ver. N/A");
         StringBuilder sbData;
 
         // Write CSV File
