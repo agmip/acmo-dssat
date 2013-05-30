@@ -92,7 +92,7 @@ public class AcmoDssatOutputFileInput extends AcmoCommonInput {
                     formats.put("exname", 10);
                     formats.put("local_name", 62);
                     formats.put("null_2", 28);
-                    formats.put("vevsion", 19);
+                    formats.put("vevsion", 28);
                     formats.put("date", line.length());
                     // Read line and save into return holder
                     HashMap tmp = readLine(line, formats);
