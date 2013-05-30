@@ -33,7 +33,7 @@ public class DssatAcmo implements AcmoTranslator {
         HashMap result = dssatReader.readFile(sourceFolder);
         try {
             // Output CSV File
-            AcmoDssatCsvOutput csvWriter = new AcmoDssatCsvOutput();
+            AcmoDssatCsvOutput csvWriter = new AcmoDssatCsvOutput(sourceFolder);
             csvWriter.writeFile(destFolder, result);
             return csvWriter.getOutputFile();
         } catch (Exception e) {

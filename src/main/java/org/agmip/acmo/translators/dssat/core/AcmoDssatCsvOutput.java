@@ -24,6 +24,18 @@ import org.slf4j.LoggerFactory;
 public class AcmoDssatCsvOutput extends AcmoCommonOutput {
 
     private static final Logger log = LoggerFactory.getLogger(AcmoDssatCsvOutput.class);
+    private String metaFilePath = null;
+    
+    public AcmoDssatCsvOutput() {
+    }
+    
+    public AcmoDssatCsvOutput(String sourceFolder) {
+        File dir = new File(sourceFolder);
+        if (!dir.isDirectory()) {
+            dir = dir.getParentFile();
+        }
+        this.metaFilePath = dir.getAbsolutePath() + File.separator + "ACMO_meta.dat";
+    }
 
     /**
      * Get output file object
@@ -66,7 +78,7 @@ public class AcmoDssatCsvOutput extends AcmoCommonOutput {
 
         // Write CSV File
         outputCsvPath = revisePath(outputCsvPath);
-        outputFile = AcmoUtil.createCsvFile(outputCsvPath, "DSSAT");
+        outputFile = AcmoUtil.createCsvFile(outputCsvPath, "DSSAT", metaFilePath);
         BufferedWriter bw = new BufferedWriter(new FileWriter(outputFile));
         String line;
         while ((line = brCsv.readLine()) != null) {
