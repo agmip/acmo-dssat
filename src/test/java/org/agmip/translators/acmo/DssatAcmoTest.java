@@ -19,19 +19,31 @@ public class DssatAcmoTest {
 
     DssatAcmo runner;
     URL resource;
+    URL resource2;
 
     @Before
     public void setUp() throws Exception {
         runner = new DssatAcmo();
         resource = this.getClass().getClassLoader().getResource("testCsv.zip");
+        resource2 = this.getClass().getClassLoader().getResource("DSSAT");
     }
 
     @Test
-    public void test() throws IOException, Exception {
+    public void testZip() throws IOException, Exception {
         File file = runner.execute(resource.getPath(), "");
         if (file != null) {
             assertTrue(file.exists());
-            assertTrue(file.getName().matches("ACMO_DSSAT( \\(\\d\\))*.csv"));
+            assertTrue(file.getName().matches("ACMO-DSSAT( \\(\\d\\))*.csv"));
+            assertTrue(file.delete());
+        }
+    }
+
+    @Test
+    public void testFolder() throws IOException, Exception {
+        File file = runner.execute(resource2.getPath(), "");
+        if (file != null) {
+            assertTrue(file.exists());
+            assertTrue(file.getName().matches("ACMO-UFGA-0-0XXX-0-0-DSSAT( \\(\\d\\))*.csv"));
             assertTrue(file.delete());
         }
     }
