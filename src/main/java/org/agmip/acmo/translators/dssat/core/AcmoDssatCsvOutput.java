@@ -114,6 +114,8 @@ public class AcmoDssatCsvOutput extends AcmoCommonOutput {
                 sbData.append(",\"").append(getObjectOr(sumSubData, "etcp", "")).append("\""); // ETCP
                 sbData.append(",\"").append(getObjectOr(sumSubData, "nucm", "")).append("\""); // NUCM
                 sbData.append(",\"").append(getObjectOr(sumSubData, "nlcm", "")).append("\""); // NLCM
+                sbData.append(",\"").append(getObjectOr(sumSubData, "epcp", "")).append("\""); // EPCP
+                sbData.append(",\"").append(getObjectOr(sumSubData, "escp", "")).append("\""); // ESCP
                 bw.write(sbData.toString());
             }
 
