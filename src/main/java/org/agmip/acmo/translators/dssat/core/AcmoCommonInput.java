@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import org.agmip.common.Functions;
 import org.agmip.core.types.TranslatorInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,11 +58,10 @@ public abstract class AcmoCommonInput implements TranslatorInput {
             ret = readFile(getBufferReader(filePath));
 
         } catch (FileNotFoundException fe) {
-            System.out.println("File not found under following path : [" + filePath + "]!");
+            log.error("File not found under following path : {}!", filePath);
             return ret;
         } catch (Exception e) {
-            //System.out.println(e.getMessage());
-            e.printStackTrace();
+            log.error(Functions.getStackTrace(e));
         }
 
         return ret;

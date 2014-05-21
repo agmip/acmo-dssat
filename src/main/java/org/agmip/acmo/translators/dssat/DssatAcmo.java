@@ -5,6 +5,7 @@ import java.util.HashMap;
 import org.agmip.acmo.translators.AcmoTranslator;
 import org.agmip.acmo.translators.dssat.core.AcmoDssatCsvOutput;
 import org.agmip.acmo.translators.dssat.core.AcmoDssatOutputFileInput;
+import org.agmip.common.Functions;
 //import static org.agmip.common.Functions.printStackTrace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,12 +33,11 @@ public class DssatAcmo implements AcmoTranslator {
         HashMap result = dssatReader.readFile(sourceFolder);
         try {
             // Output CSV File
-            AcmoDssatCsvOutput csvWriter = new AcmoDssatCsvOutput();
+            AcmoDssatCsvOutput csvWriter = new AcmoDssatCsvOutput(sourceFolder);
             csvWriter.writeFile(destFolder, result);
             return csvWriter.getOutputFile();
         } catch (Exception e) {
-//            LOG.error(getStackTrace(e));
-            e.printStackTrace();
+            LOG.error(Functions.getStackTrace(e));
             return null;
         }
     }
