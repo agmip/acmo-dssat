@@ -3,7 +3,7 @@
 
     <groupId>org.agmip.translators.acmo</groupId>
     <artifactId>acmo-dssat</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>acmo-dssat</name>
     <description>
@@ -13,7 +13,7 @@
     <parent>
         <groupId>org.agmip.translators</groupId>
         <artifactId>translator-dist</artifactId>
-        <version>1.0.2</version>
+        <version>1.0.3</version>
     </parent>
 
     <properties>
@@ -61,6 +61,10 @@
             <artifactId>acmo</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.agmip</groupId>
+            <artifactId>agmip-common-functions</artifactId>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
@@ -74,7 +78,7 @@
         <connection>scm:git:git://github.com/agmip/acmo-dssat.git</connection>
         <developerConnection>scm:git:git@github.com:agmip/acmo-dssat.git</developerConnection>
         <url>https://github.com/agmip/acmo-dssat</url>
-        <tag>acmo-dssat-1.0.1</tag>
+        <tag>HEAD</tag>
     </scm>
     <build>
         <plugins>
