@@ -43,7 +43,7 @@ public class DssatAcmoTest {
         File file = runner.execute(resource2.getPath(), "");
         if (file != null) {
             assertTrue(file.exists());
-            assertTrue(file.getName().matches("ACMO-UFGA-0-0XXX-0-0-DSSAT( \\(\\d\\))*.csv"));
+            assertTrue(file.getName().matches("ACMO-UFGA-MZ-0XXX-0-0-DSSAT( \\(\\d\\))*.csv"));
             assertTrue(file.delete());
         }
     }
