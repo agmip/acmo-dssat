@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import static org.agmip.acmo.translators.dssat.core.AcmoCommonOutput.*;
 import org.agmip.acmo.util.AcmoUtil;
+import org.agmip.util.MapUtil;
 import static org.agmip.util.MapUtil.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,6 +98,7 @@ public class AcmoDssatCsvOutput extends AcmoCommonOutput {
             if (line.endsWith(",") && line.matches(".+,[^,]+,$")) {
                 line = line.substring(0, line.length() - 1);
             }
+            line = AcmoUtil.addAcmouiVersion(line, MapUtil.getValueOr(data, "acmoVer", ""));
             bw.write(line);
 
             // wirte simulation output info
