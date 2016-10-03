@@ -3,6 +3,7 @@ package org.agmip.acmo.translators.dssat;
 import java.io.File;
 import java.util.HashMap;
 import org.agmip.acmo.translators.AcmoTranslator;
+import org.agmip.acmo.translators.AcmoVersionRecordable;
 import org.agmip.acmo.translators.dssat.core.AcmoDssatCsvOutput;
 import org.agmip.acmo.translators.dssat.core.AcmoDssatOutputFileInput;
 import org.agmip.common.Functions;
@@ -15,9 +16,10 @@ import org.slf4j.LoggerFactory;
  *
  * @author Meng Zhang
  */
-public class DssatAcmo implements AcmoTranslator {
+public class DssatAcmo implements AcmoTranslator, AcmoVersionRecordable {
 
     private static final Logger LOG = LoggerFactory.getLogger(DssatAcmo.class);
+    private String acmoVer = "";
 
     /**
      * Output ACMO csv File with DSSAT output data
@@ -31,6 +33,7 @@ public class DssatAcmo implements AcmoTranslator {
         // Read DSSAT output data
         AcmoDssatOutputFileInput dssatReader = new AcmoDssatOutputFileInput();
         HashMap result = dssatReader.readFile(sourceFolder);
+        result.put("acmoVer", acmoVer);
         try {
             // Output CSV File
             AcmoDssatCsvOutput csvWriter = new AcmoDssatCsvOutput(sourceFolder);
@@ -40,5 +43,10 @@ public class DssatAcmo implements AcmoTranslator {
             LOG.error(Functions.getStackTrace(e));
             return null;
         }
+    }
+
+    @Override
+    public void recordAcmoVersion(String acmoVer) {
+        this.acmoVer = acmoVer;
     }
 }

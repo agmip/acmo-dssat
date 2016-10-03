@@ -56,7 +56,7 @@ public abstract class AcmoCommonInput implements TranslatorInput {
         try {
             // read file by file
             ret = readFile(getBufferReader(filePath));
-
+                
         } catch (FileNotFoundException fe) {
             log.error("File not found under following path : {}!", filePath);
             return ret;
@@ -173,14 +173,11 @@ public abstract class AcmoCommonInput implements TranslatorInput {
     /**
      * Check if input is a valid value
      *
+     * @param value
      * @return check result
      */
     protected boolean checkValidValue(String value) {
-        if (value == null || value.trim().equals(defValC) || value.equals(defValI) || value.equals(defValR)) {
-            return false;
-        } else {
-            return true;
-        }
+        return !(value == null || value.trim().equals(defValC) || value.equals(defValI) || value.equals(defValR));
     }
 
     /**
@@ -218,6 +215,8 @@ public abstract class AcmoCommonInput implements TranslatorInput {
                     }
                 }
             }
+            
+            in.close();
         } // If input File is not ZIP file
         else {
             File f = new File(filePath);
