@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import static org.agmip.acmo.translators.dssat.core.AcmoCommonOutput.*;
 import org.agmip.acmo.util.AcmoUtil;
+import org.agmip.common.Functions;
 import org.agmip.util.MapUtil;
 import static org.agmip.util.MapUtil.*;
 import org.slf4j.Logger;
@@ -118,6 +119,13 @@ public class AcmoDssatCsvOutput extends AcmoCommonOutput {
                 sbData.append(",\"").append(getObjectOr(sumSubData, "nlcm", "")).append("\""); // NLCM
                 sbData.append(",\"").append(getObjectOr(sumSubData, "epcp", "")).append("\""); // EPCP
                 sbData.append(",\"").append(getObjectOr(sumSubData, "escp", "")).append("\""); // ESCP
+                sbData.append(",\"").append(getObjectOr(sumSubData, "srada", "")).append("\""); // SRAA
+                String tmaxa = getObjectOr(sumSubData, "tmaxa", "");
+                String tmina = getObjectOr(sumSubData, "tmina", "");
+                sbData.append(",\"").append(tmaxa).append("\""); // TMAXA
+                sbData.append(",\"").append(tmina).append("\""); // TMINA
+                sbData.append(",\"").append(Functions.divide(Functions.sum(tmaxa, tmina), "2")).append("\""); // TAVGA
+                sbData.append(",\"").append(getObjectOr(sumSubData, "co2a", "")).append("\""); // CO2D
                 bw.write(sbData.toString());
             }
 
