@@ -90,9 +90,9 @@ public class AcmoDssatOutputFileInput extends AcmoCommonInput {
                     // Set variables' formats
                     formats.clear();
                     formats.put("null_1", 11);
-                    formats.put("exname", 10);
+                    formats.put("null_2", 10);
                     formats.put("local_name", 62);
-                    formats.put("null_2", 28);
+                    formats.put("null_3", 28);
                     formats.put("version", 28);
                     formats.put("date", line.length());
                     // Read line and save into return holder
@@ -201,35 +201,35 @@ public class AcmoDssatOutputFileInput extends AcmoCommonInput {
 
                 // Set variables' formats based on title line
                 formats.clear();
-                formats.put("runno", 9);
-                formats.put("trno", 7);
-                formats.put("r#", 3);
-                formats.put("o#", 3);
-                formats.put("c#", 3);
-                formats.put("cr", 3);
-                formats.put("model", 9);
-                formats.put("tnam", 26);
-                formats.put("fnam", 9);
-                formats.put("wsta", 9);
-                formats.put("soil_id", 11);
-//                line = line.replaceFirst("@", "").trim();
-//                titles = line.split("\\.*\\s+");
-//                for (String title : titles) {
-//                    title = title.toLowerCase();
-//                    if (defLength.containsKey(title)) {
-//                        formats.put(title, defLength.get(title));
-//                    } else {
-//                        log.error("Unrecognized variable [{}] detected in title line of Summary.out file", title);
-//                        return new HashMap();
-//                    }
+//                formats.put("runno", 9);
+//                formats.put("trno", 7);
+//                formats.put("r#", 3);
+//                formats.put("o#", 3);
+//                formats.put("c#", 3);
+//                formats.put("cr", 3);
+//                formats.put("model", 9);
+//                formats.put("tnam", 26);
+//                formats.put("fnam", 9);
+//                formats.put("wsta", 9);
+//                formats.put("soil_id", 11);
+////                line = line.replaceFirst("@", "").trim();
+////                titles = line.split("\\.*\\s+");
+////                for (String title : titles) {
+////                    title = title.toLowerCase();
+////                    if (defLength.containsKey(title)) {
+////                        formats.put(title, defLength.get(title));
+////                    } else {
+////                        log.error("Unrecognized variable [{}] detected in title line of Summary.out file", title);
+////                        return new HashMap();
+////                    }
+////                }
+//
+//                if (line.length() < 93) {
+//                    log.warn("Detected unregconized format of title in Summary.out file: [{}]", line);
+//                    line = "";
+//                } else {
+//                    line = line.substring(92);
 //                }
-
-                if (line.length() < 93) {
-                    log.warn("Detected unregconized format of title in Summary.out file: [{}]", line);
-                    line = "";
-                } else {
-                    line = line.substring(92);
-                }
                 boolean isTitle = false;
                 StringBuilder sb = new StringBuilder();
                 int len = 0;

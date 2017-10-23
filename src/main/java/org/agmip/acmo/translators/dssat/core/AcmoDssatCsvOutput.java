@@ -126,6 +126,8 @@ public class AcmoDssatCsvOutput extends AcmoCommonOutput {
                 sbData.append(",\"").append(tmina).append("\""); // TMINA
                 sbData.append(",\"").append(Functions.divide(Functions.sum(tmaxa, tmina), "2")).append("\""); // TAVGA
                 sbData.append(",\"").append(getObjectOr(sumSubData, "co2a", "")).append("\""); // CO2D
+                sbData.append(",\"").append(getObjectOr(sumSubData, "ir#m", "")).append("\""); // IR#C
+                sbData.append(",\"").append(getObjectOr(sumSubData, "ircm", "")).append("\""); // IR_TOT
                 bw.write(sbData.toString());
             }
 
